@@ -1,6 +1,20 @@
 import {createGame,roll,choose,bank,next,cpuAction,available,total,target,score,worms} from './game.js';
 const $=id=>document.getElementById(id);
-let state;try{state=JSON.parse(localStorage.getItem('heck-v1'));if(!state?.players||!state.phase)state=null;}catch{}
+const updateResumeKey='heck-update-resume';
+let state;
+try{
+ const snapshot=JSON.parse(sessionStorage.getItem(updateResumeKey));
+ sessionStorage.removeItem(updateResumeKey);
+ const age=Date.now()-snapshot?.at;
+ if(performance.getEntriesByType('navigation')[0]?.type==='reload'&&age>=0&&age<15000&&snapshot?.state?.players?.length>=3&&snapshot?.state?.phase)state=snapshot.state;
+}catch{}
+if(!state){
+ let count=3;
+ try{if(localStorage.getItem('heck-player-count')==='4')count=4;}catch{}
+ state=createGame(count);
+}
+// Old saved games are no longer resumed at launch.
+try{localStorage.removeItem('heck-v1');}catch{}
 let timer, rolling=null;
 function beginRoll(){
  if(rolling||state.phase!=='roll'||state.kept.length===8)return;
@@ -21,10 +35,9 @@ function beginRoll(){
 }
 const worm='<img class="worm-art" src="worm.png" alt="虫">';
 const face=f=>f===6?worm:`<span class="pips pips-${f}">${Array.from({length:9},(_,i)=>`<i class="${({1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8]})[f].includes(i)?'dot':''}"></i>`).join('')}</span>`;
-function save(){try{localStorage.setItem('heck-v1',JSON.stringify(state));}catch{}}
 function action(label,handler,primary=false,disabled=false){const b=document.createElement('button');b.textContent=label;b.className=primary?'primary':'secondary';b.disabled=disabled;b.onclick=()=>{handler();render();};$('actions').append(b);}
 function render(){
- clearTimeout(timer);if(!state)return;save();const s=state,isRolling=rolling?.state===s,human=s.turn===0,over=s.phase==='over',between=s.phase==='between';
+ clearTimeout(timer);if(!state)return;const s=state,isRolling=rolling?.state===s,human=s.turn===0,over=s.phase==='over',between=s.phase==='between';
  $('remaining').textContent=`残り ${s.center.length} 枚`;
  $('tiles').innerHTML=Array.from({length:16},(_,i)=>i+21).map(n=>{const live=s.center.includes(n),down=s.down.includes(n);return `<div class="tile ${live?'':down?'flipped':'taken'}" aria-label="${n}${live?' 虫'+worms(n)+'匹':down?' 裏向き':' 獲得済み'}"><strong>${down?'✕':n}</strong><span>${live?worm.repeat(worms(n)):down?'CLOSED':'獲得済'}</span></div>`;}).join('');
  $('players').innerHTML=s.players.map((p,i)=>`<article class="player ${s.turn===i&&!over?'active':''}"><div class="player-top"><span class="avatar">${['🧑‍🍳','🐥','🐔','🐦'][i]}</span><div><h3>${p.name}</h3><small>${i?'CPU':'YOU'}${s.turn===i&&!over?' ・ 手番':''}</small></div><strong>${score(p)}<small> 匹</small></strong></div><div class="stack"><span>${p.stack.length}枚</span><b>${p.stack.at(-1)??'—'}</b></div><small class="collection">${p.stack.length?p.stack.join(' · '):'まだお皿は空っぽ'}</small></article>`).join('');
@@ -54,16 +67,17 @@ function results(){const best=Math.max(...state.players.map(score));return state
 function openSetup(){if(!$('setup').open)$('setup').showModal();}
 $('history-open').onclick=()=>$('history-dialog').showModal();$('history-close').onclick=()=>$('history-dialog').close();
 $('help').onclick=()=>$('rules').showModal();$('close-rules').onclick=()=>$('rules').close();$('new-game').onclick=openSetup;
-$('start').onclick=()=>{rolling=null;state=createGame(Number($('count').value));$('setup').close();render();};
+$('start').onclick=()=>{rolling=null;const count=Number($('count').value);try{localStorage.setItem('heck-player-count',String(count));}catch{}state=createGame(count);$('setup').close();render();};
 $('cancel-setup').onclick=e=>{if(!state){e.preventDefault();$('setup').close();state=createGame();render();}};
-if(state)render();else{state=createGame();render();openSetup();}
+$('count').value=String(state.players.length);
+render();
 if('serviceWorker' in navigator){
  const wasControlled=Boolean(navigator.serviceWorker.controller);
  let reloading=false, registration, checking=false, lastCheck=0;
  navigator.serviceWorker.addEventListener('controllerchange',()=>{
   if(!wasControlled||reloading)return;
+  try{sessionStorage.setItem(updateResumeKey,JSON.stringify({at:Date.now(),state}));}catch{return;}
   reloading=true;
-  save();
   location.reload();
  });
  async function checkForUpdate(){
