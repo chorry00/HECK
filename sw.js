@@ -1,6 +1,6 @@
 const PREFIX=`heck:${self.registration.scope}:`;
 const CACHE=PREFIX+'__BUILD_VERSION__';
-const ASSETS=['./','index.html','style.css','app.js','game.js','worm.png','manifest.webmanifest','icon.svg?v=3','icon-180.png?v=3','icon-192.png?v=3','icon-512.png?v=3'];
+const ASSETS=['./','index.html','style.css','app.js','game.js','worm.png','manifest.webmanifest','icon.svg?v=4','icon-180.png?v=4','icon-192.png?v=4','icon-512.png?v=4'];
 self.addEventListener('install',event=>{
  event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
