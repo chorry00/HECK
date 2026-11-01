@@ -1,4 +1,4 @@
-const CACHE='heck-v7';
+const CACHE='heck-v8';
 const ASSETS=['./','index.html','style.css','app.js','game.js','worm.png','manifest.webmanifest','icon.svg?v=2','icon-180.png?v=2','icon-192.png?v=2','icon-512.png?v=2'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
