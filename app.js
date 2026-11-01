@@ -57,7 +57,31 @@ $('help').onclick=()=>$('rules').showModal();$('close-rules').onclick=()=>$('rul
 $('start').onclick=()=>{rolling=null;state=createGame(Number($('count').value));$('setup').close();render();};
 $('cancel-setup').onclick=e=>{if(!state){e.preventDefault();$('setup').close();state=createGame();render();}};
 if(state)render();else{state=createGame();render();openSetup();}
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+ const wasControlled=Boolean(navigator.serviceWorker.controller);
+ let reloading=false, registration, checking=false, lastCheck=0;
+ navigator.serviceWorker.addEventListener('controllerchange',()=>{
+  if(!wasControlled||reloading)return;
+  reloading=true;
+  save();
+  location.reload();
+ });
+ async function checkForUpdate(){
+  if(!registration||checking||!navigator.onLine||Date.now()-lastCheck<10000)return;
+  checking=true;lastCheck=Date.now();
+  try{await registration.update();}catch{ /* Keep the installed release available offline. */ }
+  finally{checking=false;}
+ }
+ navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(value=>{
+  registration=value;
+  checkForUpdate();
+ }).catch(()=>{});
+ window.addEventListener('pageshow',checkForUpdate);
+ window.addEventListener('online',()=>{lastCheck=0;checkForUpdate();});
+ document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')checkForUpdate();
+ });
+}
 let installPrompt;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install').hidden=false;});
 $('install').onclick=async()=>{if(installPrompt){await installPrompt.prompt();installPrompt=null;$('install').hidden=true;}};
