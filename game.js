@@ -30,8 +30,9 @@ function finishTurn(s,message) {
  s.phase=s.center.length?'between':'over';
 }
 export function fail(s,reason) {
- const p=s.players[s.turn];const highest=s.center.length?Math.max(...s.center):null;
+ const p=s.players[s.turn];
  const returned=p.stack.pop();
+ const highest=returned!==undefined&&s.center.length?Math.max(...s.center):null;
  if(returned!==undefined)s.center.push(returned);
  if(highest!==null){s.center=s.center.filter(n=>n!==highest);s.down.push(highest);}
  s.center.sort((a,b)=>a-b);
