@@ -16,6 +16,8 @@ function render(){
  const t=target(s),hasWorm=s.kept.includes(6);
  $('message').textContent=over?results():between?s.log[0]:!human?'CPUが次の一手を考えています…':s.phase==='choose'?'確保する目を1種類選んでください。':'振り直す？ それとも、ここでいただきます？';
  $('points').textContent=total(s.kept);
+ $('log').replaceChildren(...s.log.map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));
+ $('holdings').replaceChildren(...s.players.map(p=>{const el=document.createElement('p');el.textContent=`${p.name}：${score(p)}匹 / タイル ${p.stack.join('・')||'なし'}`;return el;}));
  $('kept').innerHTML=s.kept.length?s.kept.map(f=>`<span class="die saved ${f===6?'worm':''}">${face(f)}</span>`).join(''):'<span class="empty">選んだサイコロがここに並びます</span>';
  $('dice').replaceChildren();
  for(const f of s.dice){const b=document.createElement('button');b.className=`die ${f===6?'worm':''}`;b.innerHTML=face(f);b.setAttribute('aria-label',`${f===6?'虫':f}の目をすべて確保`);b.disabled=!human||!available(s).includes(f);b.onclick=()=>{choose(s,f);render();};$('dice').append(b);}
@@ -32,6 +34,7 @@ function render(){
 }
 function results(){const best=Math.max(...state.players.map(score));return state.players.filter(p=>score(p)===best).map(p=>p.name).join('と')+`の勝利！ 虫 ${best} 匹を集めました。`;}
 function openSetup(){if(!$('setup').open)$('setup').showModal();}
+$('history-open').onclick=()=>$('history-dialog').showModal();$('history-close').onclick=()=>$('history-dialog').close();
 $('help').onclick=()=>$('rules').showModal();$('close-rules').onclick=()=>$('rules').close();$('new-game').onclick=openSetup;
 $('start').onclick=()=>{state=createGame(Number($('count').value));$('setup').close();render();};
 $('cancel-setup').onclick=e=>{if(!state){e.preventDefault();$('setup').close();state=createGame();render();}};
