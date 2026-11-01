@@ -50,7 +50,7 @@ export function next(s) {
  if(s.phase!=='between')return;
  s.turn=(s.turn+1)%s.players.length;s.round++;s.phase='roll';
 }
-export function cpuAction(s) {
+export function cpuAction(s,rollDice=roll) {
  if(s.phase==='choose') {
   const faces=available(s);let best=faces[0],value=-Infinity;
   for(const f of faces){const count=s.dice.filter(d=>d===f).length;const v=count*(f===6?5:f)+(f===6&&!s.kept.includes(6)?9:0);if(v>value){value=v;best=f;}}
@@ -60,6 +60,6 @@ export function cpuAction(s) {
   const t=target(s),remaining=8-s.kept.length;
   if(!remaining){bank(s);return;}
   const risk=(new Set(s.kept).size/6)**remaining;
-  if(t&&(t.from!==-1||worms(t.tile)>=3||remaining<=2||risk>0.2||total(s.kept)>=26))bank(s);else roll(s);
+  if(t&&(t.from!==-1||worms(t.tile)>=3||remaining<=2||risk>0.2||total(s.kept)>=26))bank(s);else rollDice(s);
  }
 }

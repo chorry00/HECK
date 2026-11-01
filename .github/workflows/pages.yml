@@ -28,7 +28,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html style.css app.js game.js worm.svg manifest.webmanifest sw.js icon.svg icon-192.png icon-512.png _site/
+          cp index.html style.css app.js game.js worm.png manifest.webmanifest sw.js icon.svg icon-192.png icon-512.png _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -25,3 +25,8 @@
 }
 @media(max-width:360px){.player h3{font-size:13px}.player-top>strong{font-size:19px}.stack b{font-size:20px}footer>span{display:none}footer{justify-content:flex-end}}
 @media(max-width:600px) and (max-height:650px){main{gap:4px;padding:4px 0}.table{padding-top:5px;padding-bottom:6px}.turn-panel{padding:6px}.kept{padding-bottom:4px}.actions{margin-top:5px}footer,footer .quiet{min-height:24px}}
+.roll-area{perspective:600px}.rolling .die{animation:dice-tumble 650ms cubic-bezier(.2,.6,.4,1) both;animation-delay:calc(var(--die-index) * 8ms);opacity:1!important;transform-style:preserve-3d;will-change:transform;pointer-events:none}.rolling .die:nth-child(even){animation-name:dice-tumble-reverse}
+@keyframes dice-tumble{0%{transform:translateY(0) rotate(0) rotateX(0)}22%{transform:translateY(-13px) rotate(-25deg) rotateX(160deg)}48%{transform:translateY(2px) rotate(32deg) rotateX(320deg)}70%{transform:translateY(-6px) rotate(-13deg) rotateX(360deg)}88%{transform:translateY(0) rotate(6deg) rotateX(360deg)}100%{transform:translateY(0) rotate(0) rotateX(360deg)}}
+@keyframes dice-tumble-reverse{0%{transform:rotate(0) rotateY(0)}22%{transform:translateY(-10px) rotate(28deg) rotateY(-150deg)}48%{transform:translateY(2px) rotate(-26deg) rotateY(-300deg)}70%{transform:translateY(-5px) rotate(14deg) rotateY(-360deg)}100%{transform:translateY(0) rotate(0) rotateY(-360deg)}}
+@media(prefers-reduced-motion:reduce){.rolling .die{animation:none}.die:not(:disabled):is(button):hover{transform:none}}
+.tile .worm-art:nth-child(2){transform:rotate(135deg)}.tile .worm-art:nth-child(3){transform:rotate(-45deg)}.tile .worm-art:nth-child(4){transform:rotate(45deg)}
