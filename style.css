@@ -30,3 +30,5 @@
 @keyframes dice-tumble-reverse{0%{transform:rotate(0) rotateY(0)}22%{transform:translateY(-10px) rotate(28deg) rotateY(-150deg)}48%{transform:translateY(2px) rotate(-26deg) rotateY(-300deg)}70%{transform:translateY(-5px) rotate(14deg) rotateY(-360deg)}100%{transform:translateY(0) rotate(0) rotateY(-360deg)}}
 @media(prefers-reduced-motion:reduce){.rolling .die{animation:none}.die:not(:disabled):is(button):hover{transform:none}}
 .tile .worm-art:nth-child(2){transform:rotate(135deg)}.tile .worm-art:nth-child(3){transform:rotate(-45deg)}.tile .worm-art:nth-child(4){transform:rotate(45deg)}
+.brand-icon.app-icon{display:block;width:48px;height:48px;padding:0;border-radius:12px;object-fit:contain}
+@media(max-width:600px),(max-height:500px) and (pointer:coarse){.brand-icon.app-icon{width:32px;height:32px;border-radius:8px}}

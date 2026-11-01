@@ -2,7 +2,7 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root = new URL('./', import.meta.url);
-const allowed = new Set(['index.html','style.css','app.js','game.js','worm.png','manifest.webmanifest','sw.js','icon.svg','icon-192.png','icon-512.png']);
+const allowed = new Set(['index.html','style.css','app.js','game.js','worm.png','manifest.webmanifest','sw.js','icon.svg','icon-180.png','icon-192.png','icon-512.png']);
 http.createServer(async (req,res) => {
   const path = new URL(req.url,'http://localhost').pathname.slice(1) || 'index.html';
   if (!allowed.has(path)) {res.writeHead(404);res.end();return;}
