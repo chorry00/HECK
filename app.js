@@ -30,7 +30,7 @@ function render(){
  $('players').innerHTML=s.players.map((p,i)=>`<article class="player ${s.turn===i&&!over?'active':''}"><div class="player-top"><span class="avatar">${['🧑‍🍳','🐥','🐔','🐦'][i]}</span><div><h3>${p.name}</h3><small>${i?'CPU':'YOU'}${s.turn===i&&!over?' ・ 手番':''}</small></div><strong>${score(p)}<small> 匹</small></strong></div><div class="stack"><span>${p.stack.length}枚</span><b>${p.stack.at(-1)??'—'}</b></div><small class="collection">${p.stack.length?p.stack.join(' · '):'まだお皿は空っぽ'}</small></article>`).join('');
  $('turn-title').textContent=over?'本日の食堂、閉店！':`${s.players[s.turn].name}の手番`;
  $('turn-number').textContent=`TURN ${String(s.round).padStart(2,'0')}`;
- const t=target(s),hasWorm=s.kept.includes(6);
+ const t=target(s);
  $('message').textContent=isRolling?'サイコロを振っています…':over?results():between?s.log[0]:!human?'CPUが次の一手を考えています…':s.phase==='choose'?'確保する目を1種類選んでください。':'振り直す？ それとも、ここでいただきます？';
  $('points').textContent=total(s.kept);
  $('log').replaceChildren(...s.log.map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));
@@ -40,17 +40,15 @@ function render(){
  $('dice').classList.toggle('rolling',isRolling);
  $('dice').setAttribute('aria-busy',String(isRolling));
  for(const [i,f] of (isRolling?rolling.faces:s.dice).entries()){const b=document.createElement('button');b.className=`die ${f===6?'worm':''}`;b.innerHTML=face(f);b.setAttribute('aria-label',`${f===6?'虫':f}の目をすべて確保`);b.disabled=isRolling||!human||!available(s).includes(f);b.style.setProperty('--die-index',i);b.onclick=()=>{choose(s,f);render();};$('dice').append(b);}
- $('hint').textContent=isRolling?'ころころ… 出る目はお楽しみ。':over?'またのご来店をお待ちしています。':between?'ひと息ついて、次の手番へ。':s.phase==='choose'?'同じ目はまとめて確保。確保済みの目は選べません。':s.kept.length?(hasWorm?(t?`${t.tile} のタイルを${t.from===-1?'獲得できます':'横取りできます'}。`:'今は取れるタイルがありません。'):'🐛 虫の目が必要です。'):'8個のサイコロで、ごちそう探し。';
  $('actions').replaceChildren();
  if(isRolling){ /* Wait until all dice settle before enabling choices. */ }
  else if(over)action('もう一度遊ぶ →',()=>openSetup(),true);
- else if(between)action('次の手番へ →',()=>next(s),true);
  else if(human&&s.phase==='roll'){
  action(s.kept.length?`残り ${8-s.kept.length} 個を振る`:'サイコロを振る →',beginRoll,true,s.kept.length===8);
  if(s.kept.length)action(t?`${t.tile} を獲得して終了`:'失敗として終了',()=>bank(s));
  }
  if(!isRolling&&!human&&!between&&!over)timer=setTimeout(()=>{cpuAction(s,beginRoll);render();},850);
- if(between&&!human)timer=setTimeout(()=>{next(s);render();},1300);
+ if(between)timer=setTimeout(()=>{next(s);render();},1300);
 }
 function results(){const best=Math.max(...state.players.map(score));return state.players.filter(p=>score(p)===best).map(p=>p.name).join('と')+`の勝利！ 虫 ${best} 匹を集めました。`;}
 function openSetup(){if(!$('setup').open)$('setup').showModal();}
