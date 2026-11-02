@@ -32,3 +32,15 @@
 .tile .worm-art:nth-child(2){transform:rotate(135deg)}.tile .worm-art:nth-child(3){transform:rotate(-45deg)}.tile .worm-art:nth-child(4){transform:rotate(45deg)}
 .brand-icon.app-icon{display:block;width:48px;height:48px;padding:0;border-radius:12px;object-fit:contain}
 @media(max-width:600px),(max-height:500px) and (pointer:coarse){.brand-icon.app-icon{width:32px;height:32px;border-radius:8px}}
+/* Leave a small margin inside the browser's smallest visible viewport. */
+@media(max-width:600px),(max-height:500px) and (pointer:coarse){
+ .app{height:calc(100svh - 12px);min-height:0}
+ header,footer,.table,.players{flex-shrink:0}
+ main,.turn-panel{min-height:0}
+ .turn-panel #message{min-height:0;margin:4px 0;line-height:1.4}
+ .kept{min-height:34px;padding-top:3px;padding-bottom:3px}
+ .roll-area{min-height:0;padding:4px;max-height:140px}
+ .roll-area .dice{grid-template-columns:repeat(4,40px);gap:4px;min-height:40px}
+ .roll-area .die{width:40px;height:40px}
+ .actions{flex-shrink:0;margin-top:5px}
+}
