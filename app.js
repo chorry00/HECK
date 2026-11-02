@@ -15,7 +15,7 @@ if(!state){
 }
 // Old saved games are no longer resumed at launch.
 try{localStorage.removeItem('heck-v1');}catch{}
-let timer, rolling=null;
+let timer, rolling=null, announcedResult=null;
 function beginRoll(){
  if(rolling||state.phase!=='roll'||state.kept.length===8)return;
  clearTimeout(timer);
@@ -38,6 +38,7 @@ const face=f=>f===6?worm:`<span class="pips pips-${f}">${Array.from({length:9},(
 function action(label,handler,primary=false,disabled=false){const b=document.createElement('button');b.textContent=label;b.className=primary?'primary':'secondary';b.disabled=disabled;b.onclick=()=>{handler();render();};$('actions').append(b);}
 function render(){
  clearTimeout(timer);if(!state)return;const s=state,isRolling=rolling?.state===s,human=s.turn===0,over=s.phase==='over',between=s.phase==='between';
+ document.querySelector('.turn-panel').classList.toggle('game-over',over);
  $('remaining').textContent=`残り ${s.center.length} 枚`;
  $('tiles').innerHTML=Array.from({length:16},(_,i)=>i+21).map(n=>{const live=s.center.includes(n),down=s.down.includes(n);return `<div class="tile ${live?'':down?'flipped':'taken'}" aria-label="${n}${live?' 虫'+worms(n)+'匹':down?' 裏向き':' 獲得済み'}"><strong>${down?'✕':n}</strong><span>${live?worm.repeat(worms(n)):down?'CLOSED':'獲得済'}</span></div>`;}).join('');
  $('players').innerHTML=s.players.map((p,i)=>`<article class="player ${s.turn===i&&!over?'active':''}"><div class="player-top"><span class="avatar">${['🧑‍🍳','🐥','🐔','🐦'][i]}</span><div><h3>${p.name}</h3><small>${i?'CPU':'YOU'}${s.turn===i&&!over?' ・ 手番':''}</small></div><strong>${score(p)}<small> 匹</small></strong></div><div class="stack"><span>${p.stack.length}枚</span><b>${p.stack.at(-1)??'—'}</b></div><small class="collection">${p.stack.length?p.stack.join(' · '):'まだお皿は空っぽ'}</small></article>`).join('');
@@ -55,15 +56,36 @@ function render(){
  for(const [i,f] of (isRolling?rolling.faces:s.dice).entries()){const b=document.createElement('button');b.className=`die ${f===6?'worm':''}`;b.innerHTML=face(f);b.setAttribute('aria-label',`${f===6?'虫':f}の目をすべて確保`);b.disabled=isRolling||!human||!available(s).includes(f);b.style.setProperty('--die-index',i);b.onclick=()=>{choose(s,f);render();};$('dice').append(b);}
  $('actions').replaceChildren();
  if(isRolling){ /* Wait until all dice settle before enabling choices. */ }
- else if(over)action('もう一度遊ぶ →',()=>openSetup(),true);
+ else if(over){action('結果を見る 🏆',showResults,true);action('もう一度遊ぶ →',openSetup);}
  else if(human&&s.phase==='roll'){
  action(s.kept.length?`残り ${8-s.kept.length} 個を振る`:'サイコロを振る →',beginRoll,true,s.kept.length===8);
  if(s.kept.length)action(t?`${t.tile} を獲得して終了`:'失敗として終了',()=>bank(s));
  }
  if(!isRolling&&!human&&!between&&!over)timer=setTimeout(()=>{cpuAction(s,beginRoll);render();},850);
  if(between)timer=setTimeout(()=>{next(s);render();},1300);
+ if(over&&announcedResult!==s){announcedResult=s;showResults();}
 }
 function results(){const best=Math.max(...state.players.map(score));return state.players.filter(p=>score(p)===best).map(p=>p.name).join('と')+`の勝利！ 虫 ${best} 匹を集めました。`;}
+function showResults(){
+ const best=Math.max(...state.players.map(score));
+ const winners=state.players.filter(p=>score(p)===best);
+ $('result-title').textContent=winners.length===1?`${winners[0].name}の勝利！`:'引き分け！';
+ $('result-subtitle').textContent=winners.length===1?'イモムシを一番たくさん集めました！':`${winners.map(p=>p.name).join('・')}が同点で首位です。`;
+ $('result-best').textContent=best;
+ const sorted=[...state.players].sort((a,b)=>score(b)-score(a));
+ $('result-ranking').replaceChildren(...sorted.map(p=>{
+  const points=score(p),rank=1+sorted.filter(other=>score(other)>points).length;
+  const row=document.createElement('li');row.className=rank===1?'rank-winner':'';
+  for(const [className,text] of [['rank-number',`${rank}位`],['rank-name',p.name],['rank-score',`${points}匹`]]){
+   const el=document.createElement('span');el.className=className;el.textContent=text;row.append(el);
+  }
+  return row;
+ }));
+ if(!$('result-dialog').open)$('result-dialog').showModal();
+ $('result-title').focus();
+}
+$('result-close').onclick=()=>$('result-dialog').close();
+$('result-replay').onclick=()=>{$('result-dialog').close();openSetup();};
 function openSetup(){if(!$('setup').open)$('setup').showModal();}
 $('history-open').onclick=()=>$('history-dialog').showModal();$('history-close').onclick=()=>$('history-dialog').close();
 $('help').onclick=()=>$('rules').showModal();$('close-rules').onclick=()=>$('rules').close();$('new-game').onclick=openSetup;

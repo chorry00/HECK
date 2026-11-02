@@ -44,3 +44,17 @@
  .roll-area .die{width:40px;height:40px}
  .actions{flex-shrink:0;margin-top:5px}
 }
+/* A clear, dismissible finish screen with every player's final score. */
+#result-dialog{width:calc(100% - 24px);max-width:430px;max-height:calc(100svh - 24px);padding:18px;border:3px solid #c79a4c;text-align:center;background:linear-gradient(150deg,#fff9e9,#f2e8cb)}
+#result-dialog::backdrop{background:#10291de6;backdrop-filter:blur(6px)}
+.result-trophy{font-size:40px;line-height:1.1}.result-label{font-size:13px;font-weight:900;letter-spacing:3px;color:#966326;margin:8px 0 5px;line-height:1.2}
+#result-title{font-size:30px;line-height:1.3;font-weight:900;color:#254f40;margin:0;outline:none}
+#result-subtitle{font-size:14px;line-height:1.5;margin:8px 0;color:#647057}
+#result-dialog .result-score{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:10px 0 14px;line-height:1.1;color:#a35a2a}.result-score strong{font-size:48px;font-weight:900}.result-score span{font-size:13px;font-weight:700}
+#result-ranking{list-style:none;padding:0;margin:0 0 16px;display:grid;gap:5px}
+#result-ranking li{display:grid;grid-template-columns:36px 1fr 60px;gap:8px;align-items:center;min-height:38px;padding:6px 10px;border:1px solid #dadbc9;border-radius:7px;background:#fffaf1;text-align:left;font-size:14px}
+#result-ranking .rank-winner{border-color:#c79a4c;background:#f6e4ad;font-weight:900}.rank-number{font-size:12px;color:#866535}.rank-score{text-align:right;font-size:19px;font-weight:900}.result-actions{display:grid;gap:8px}.result-actions button{min-height:44px;font-size:15px}
+.turn-panel.game-over{border:2px solid #c79a4c;background:#fff4d7}.game-over .kept-head,.game-over .kept,.game-over .roll-area{display:none}.game-over #message{font-size:20px;line-height:1.5;font-weight:900;color:#805124;margin:16px 0}.game-over .actions{margin-top:auto}
+@media(max-width:360px),(max-height:600px){#result-dialog{padding:16px}.result-trophy{font-size:32px}#result-title{font-size:26px}.result-score strong{font-size:40px}#result-dialog .result-score{margin:8px 0 12px}#result-ranking{margin-bottom:12px}.game-over #message{font-size:18px}}
+@media(prefers-reduced-motion:no-preference){#result-dialog[open]{animation:result-appear 220ms ease-out}@keyframes result-appear{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}}
+@media(max-height:600px){#result-dialog .result-trophy{display:none}#result-dialog .result-label{margin:4px 0}#result-dialog #result-subtitle{font-size:13px;line-height:1.3;margin:6px 0}#result-dialog .result-score{margin:8px 0}#result-dialog .result-score strong{font-size:36px}#result-dialog #result-ranking{gap:4px;margin-bottom:10px}#result-dialog #result-ranking li{min-height:32px;padding:4px 8px;font-size:13px}#result-dialog .rank-score{font-size:17px}#result-dialog .result-actions{grid-template-columns:1fr 1fr;gap:6px}#result-dialog .result-actions button{font-size:13px;padding:8px}}
